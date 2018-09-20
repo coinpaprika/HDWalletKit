@@ -49,7 +49,7 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let network = Network.main
+        let network = Network.main(.bitcoin)
         let privateKey = PrivateKey(seed: seed, network: network)
         
         XCTAssertEqual(
@@ -83,7 +83,7 @@ class WalletKitTests: XCTestCase {
         // m/44'/0'/0'/0
         let firstPrivateKey = change.derived(at: 0)
         XCTAssertEqual(
-            firstPrivateKey.publicKey.address,
+            firstPrivateKey.publicKey.addressProvider.address,
             "128BCBZndgrPXzEgF4QbVR3jnQGwzRtEz5"
         )
         
@@ -97,7 +97,7 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let network = Network.test
+        let network = Network.test(.bitcoin)
         let privateKey = PrivateKey(seed: seed, network: network)
         
         XCTAssertEqual(
@@ -131,7 +131,7 @@ class WalletKitTests: XCTestCase {
         // m/44'/0'/0'/0
         let firstPrivateKey = change.derived(at: 0)
         XCTAssertEqual(
-            firstPrivateKey.publicKey.address,
+            firstPrivateKey.publicKey.addressProvider.address,
             "mq1VMMXiZKLdY2WLeaqocJxXijhEFoQu3X"
         )
         
@@ -145,7 +145,7 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let wallet = Wallet(seed: seed, network: .main)
+        let wallet = Wallet(seed: seed, network: .main(.bitcoin))
         
         let firstAddress = wallet.generateAddress(at: 0)
         XCTAssertEqual(firstAddress, "128BCBZndgrPXzEgF4QbVR3jnQGwzRtEz5")
@@ -165,7 +165,7 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let wallet = Wallet(seed: seed, network: .test)
+        let wallet = Wallet(seed: seed, network: .test(.bitcoin))
         
         let firstAddress = wallet.generateAddress(at: 0)
         XCTAssertEqual(firstAddress, "mq1VMMXiZKLdY2WLeaqocJxXijhEFoQu3X")
@@ -185,18 +185,18 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let wallet = Wallet(seed: seed, network: .main)
+        let wallet = Wallet(seed: seed, network: .main(.bitcoin), spec: .bip49)
         
-        let firstAddressP2SH = wallet.generateAddressBIP49(at: 0)
+        let firstAddressP2SH = wallet.generateAddress(at: 0)
         XCTAssertEqual(firstAddressP2SH, "32K5SuFrxTYMGjGRFStmdU1bPTrQ2GhsnV")
 
-        let secondAddressP2SH = wallet.generateAddressBIP49(at: 1)
+        let secondAddressP2SH = wallet.generateAddress(at: 1)
         XCTAssertEqual(secondAddressP2SH, "3FQTSxzUrxnApYTu5Wtt99sqrvtodPyKcV")
         
-        let thirdAddressP2SH = wallet.generateAddressBIP49(at: 2)
+        let thirdAddressP2SH = wallet.generateAddress(at: 2)
         XCTAssertEqual(thirdAddressP2SH, "34uY5KLosSPpuTkzsvfBwPBjav4u2n6GTh")
         
-        let forthAddressP2SH = wallet.generateAddressBIP49(at: 3)
+        let forthAddressP2SH = wallet.generateAddress(at: 3)
         XCTAssertEqual(forthAddressP2SH, "357mLUhA6CTzBTkJMVSiw2rQBUwJibRCSp")
         
     }
@@ -205,18 +205,18 @@ class WalletKitTests: XCTestCase {
         let entropy = Data(hex: "000102030405060708090a0b0c0d0e0f")
         let mnemonic = Mnemonic.create(entropy: entropy)
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
-        let wallet = Wallet(seed: seed, network: .main)
+        let wallet = Wallet(seed: seed, network: .main(.bitcoin), spec: .bip84)
         
-        let firstAddressBech32 = wallet.generateAddressBIP84(at: 0)
+        let firstAddressBech32 = wallet.generateAddress(at: 0)
         XCTAssertEqual(firstAddressBech32, "bc1qdsdxmlnu5phmwaw9fy88vm57n552l9ztcg4rev")
         
-        let secondAddressBech32 = wallet.generateAddressBIP84(at: 1)
+        let secondAddressBech32 = wallet.generateAddress(at: 1)
         XCTAssertEqual(secondAddressBech32, "bc1qn8e93hk0gdmwwq7xhmqy7k7pza8gunlftgyltp")
         
-        let thirdAddressBech32 = wallet.generateAddressBIP84(at: 2)
+        let thirdAddressBech32 = wallet.generateAddress(at: 2)
         XCTAssertEqual(thirdAddressBech32, "bc1qtm5rsf56v5u2v39jd7800av4aumrs2dva8cxfd")
         
-        let forthAddressBech32 = wallet.generateAddressBIP84(at: 3)
+        let forthAddressBech32 = wallet.generateAddress(at: 3)
         XCTAssertEqual(forthAddressBech32, "bc1qntew983t8y752fn0tpex3dc5pu8ae2du6d8ghv")
     }
 }

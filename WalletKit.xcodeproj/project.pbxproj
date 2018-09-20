@@ -43,6 +43,9 @@
 		AED560762019B9A30060A676 /* ECDSA.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AED02D9B2019B7E100B76CEC /* ECDSA.framework */; };
 		AED5607C2019C8540060A676 /* secp256k1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AED5607B2019C8540060A676 /* secp256k1.framework */; };
 		AED560822019CC4F0060A676 /* ECDSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED560812019CC4F0060A676 /* ECDSA.swift */; };
+		D992D7C62153CEFA0038E113 /* AddressFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7C52153CEFA0038E113 /* AddressFactory.swift */; };
+		D992D7C92153D2D90038E113 /* BitcoinAddressProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7C82153D2D90038E113 /* BitcoinAddressProvider.swift */; };
+		D992D7CB2153D30D0038E113 /* EthereumAddressProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7CA2153D30D0038E113 /* EthereumAddressProvider.swift */; };
 		FA587C8B20BC47C60033F34A /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8A20BC47C60033F34A /* Bech32.swift */; };
 		FA587C8D20BC4C1A0033F34A /* SegwitAddrCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8C20BC4C1A0033F34A /* SegwitAddrCoder.swift */; };
 /* End PBXBuildFile section */
@@ -131,6 +134,9 @@
 		AED560792019C7F20060A676 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		AED5607B2019C8540060A676 /* secp256k1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = secp256k1.framework; sourceTree = "<group>"; };
 		AED560812019CC4F0060A676 /* ECDSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ECDSA.swift; sourceTree = "<group>"; };
+		D992D7C52153CEFA0038E113 /* AddressFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressFactory.swift; sourceTree = "<group>"; };
+		D992D7C82153D2D90038E113 /* BitcoinAddressProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitcoinAddressProvider.swift; sourceTree = "<group>"; };
+		D992D7CA2153D30D0038E113 /* EthereumAddressProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumAddressProvider.swift; sourceTree = "<group>"; };
 		FA587C8A20BC47C60033F34A /* Bech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32.swift; sourceTree = "<group>"; };
 		FA587C8C20BC4C1A0033F34A /* SegwitAddrCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegwitAddrCoder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -232,6 +238,8 @@
 				AE10B15420305C3F00565720 /* Base58Encode.swift */,
 				AE6639F02027470C0055B143 /* RIPEMD160.swift */,
 				AE10B15220305B6500565720 /* DataConvertable.swift */,
+				D992D7C52153CEFA0038E113 /* AddressFactory.swift */,
+				D992D7C72153D2C70038E113 /* Addresses */,
 				AE299DFF2018A642002769F9 /* BigInt */,
 				AEBA90D81FFA21ED003EA2BA /* WalletKit.h */,
 				AEBA90D91FFA21ED003EA2BA /* Info.plist */,
@@ -281,6 +289,15 @@
 				AED560792019C7F20060A676 /* module.modulemap */,
 			);
 			path = ProjectModule;
+			sourceTree = "<group>";
+		};
+		D992D7C72153D2C70038E113 /* Addresses */ = {
+			isa = PBXGroup;
+			children = (
+				D992D7C82153D2D90038E113 /* BitcoinAddressProvider.swift */,
+				D992D7CA2153D30D0038E113 /* EthereumAddressProvider.swift */,
+			);
+			path = Addresses;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -390,7 +407,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0920;
-				ORGANIZATIONNAME = yuzushioh;
+				ORGANIZATIONNAME = Coinpaprika;
 				TargetAttributes = {
 					AE90A0741FFA698D005ED7AF = {
 						CreatedOnToolsVersion = 9.2;
@@ -481,9 +498,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D992D7C92153D2D90038E113 /* BitcoinAddressProvider.swift in Sources */,
+				D992D7C62153CEFA0038E113 /* AddressFactory.swift in Sources */,
 				AE8291AA2018C1F10047E0F0 /* BigInt+Extension.swift in Sources */,
 				AE8291A02018ADAF0047E0F0 /* Wallet.swift in Sources */,
 				AE82919F2018ADAF0047E0F0 /* Network.swift in Sources */,
+				D992D7CB2153D30D0038E113 /* EthereumAddressProvider.swift in Sources */,
 				AE10B15520305C3F00565720 /* Base58Encode.swift in Sources */,
 				FA587C8B20BC47C60033F34A /* Bech32.swift in Sources */,
 				AE8291A62018ADAF0047E0F0 /* WordList.swift in Sources */,
