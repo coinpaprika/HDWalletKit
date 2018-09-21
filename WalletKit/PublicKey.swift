@@ -40,6 +40,10 @@ public struct PublicKey {
         return Base58.encode(extendedPublicKeyData + checksum)
     }
     
+    public lazy var uncompressed: Data = {
+        return Crypto.generatePublicKey(data: privateKey.raw, compressed: false)
+    }()
+    
     var addressProvider: AddressProvider {
         return AddressFactory.provider(network: network, publicKey: self)
     }

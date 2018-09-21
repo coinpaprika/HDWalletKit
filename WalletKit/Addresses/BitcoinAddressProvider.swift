@@ -45,7 +45,7 @@ public class BitcoinAddressProvider: AddressProvider {
     }
     
     // NOTE: https://github.com/bitcoin/bips/blob/master/bip-0013.mediawiki
-    public var address: String {
+    public var address: String? {
         switch publicKey.spec {
         case .bip44:
             return addressBIP44

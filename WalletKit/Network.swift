@@ -8,19 +8,26 @@
 
 public enum Coin {
     case bitcoin
-    case litecoin
-    case nem
+//    case litecoin
+//    case nem
     case ethereum
     case ethereumClassic
-    case monero
-    case zcash
-    case lisk
-    case bitcoinCash
+//    case monero
+//    case zcash
+//    case lisk
+//    case bitcoinCash
 }
 
 public enum Network {
     case main(Coin)
     case test(Coin)
+    
+    public var coin: Coin {
+        switch self {
+        case .main(let coin), .test(let coin):
+            return coin
+        }
+    }
 
     public var privateKeyVersion: UInt32 {
         switch self {
@@ -47,22 +54,22 @@ public enum Network {
             switch coin {
             case .bitcoin:
                 return 0
-            case .litecoin:
-                return 2
-            case .nem:
-                return 43
+//            case .litecoin:
+//                return 2
+//            case .nem:
+//                return 43
             case .ethereum:
                 return 60
             case .ethereumClassic:
                 return 61
-            case .monero:
-                return 128
-            case .zcash:
-                return 133
-            case .lisk:
-                return 134
-            case .bitcoinCash:
-                return 145
+//            case .monero:
+//                return 128
+//            case .zcash:
+//                return 133
+//            case .lisk:
+//                return 134
+//            case .bitcoinCash:
+//                return 145
             }
             
         case .test:

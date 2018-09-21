@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         print(seed.toHexString())
         
         // By calling initialize, you can now access to your wallet.
-        let wallet = Wallet(seed: seed, network: .main)
+        let wallet = Wallet(seed: seed, network: .main(.bitcoin))
         print(wallet.generateAddress(at: 0))
     }
 }

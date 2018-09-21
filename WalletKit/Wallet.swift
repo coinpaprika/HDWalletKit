@@ -65,7 +65,7 @@ public final class Wallet {
         return receivePrivateKey.derived(at: index).publicKey.addressProvider
     }
     
-    public func generateAddress(at index: UInt32) -> String {
+    public func generateAddress(at index: UInt32) -> String? {
         return receivePrivateKey.derived(at: index).publicKey.addressProvider.address
     }
 }
