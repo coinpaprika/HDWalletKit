@@ -44,6 +44,7 @@
 		D992D7D82154E4E60038E113 /* LitecoinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7D72154E4E60038E113 /* LitecoinTests.swift */; };
 		D992D7DD21551A640038E113 /* ECDSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7DC21551A640038E113 /* ECDSA.swift */; };
 		D992D7DE21551A7F0038E113 /* secp256k1.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D992D7D9215519BF0038E113 /* secp256k1.framework */; };
+		D992D7DF215520CC0038E113 /* secp256k1.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D992D7D9215519BF0038E113 /* secp256k1.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA587C8B20BC47C60033F34A /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8A20BC47C60033F34A /* Bech32.swift */; };
 		FA587C8D20BC4C1A0033F34A /* SegwitAddrCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8C20BC4C1A0033F34A /* SegwitAddrCoder.swift */; };
 /* End PBXBuildFile section */
@@ -79,6 +80,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				D992D7DF215520CC0038E113 /* secp256k1.framework in Embed Frameworks */,
 				AEBA91051FFA2C74003EA2BA /* WalletKit.framework in Embed Frameworks */,
 				AEBA91031FFA2C74003EA2BA /* CryptoSwift.framework in Embed Frameworks */,
 			);
