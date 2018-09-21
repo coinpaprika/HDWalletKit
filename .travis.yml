@@ -7,7 +7,6 @@ language: swift
 # cache: cocoapods
 # podfile: Example/Podfile
 before_install:
-- gem install carthage
 - carthage build
 script:
 - set -o pipefail && xcodebuild test -enableCodeCoverage YES -project WalletKit.xcodeproj -scheme Example -sdk iphonesimulator12.0  -destination 'platform=iOS Simulator,name=iPhone XR,OS=12.0' | xcpretty
