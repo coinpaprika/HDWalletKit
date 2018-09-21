@@ -1,4 +1,7 @@
 # WalletKit
+
+[![CI Status](https://img.shields.io/travis/coinpaprika/HDWalletKit.svg?style=flat)](https://travis-ci.org/coinpaprika/HDWalletKit)
+
 WalletKit is a Swift framwork that enables you to create and use bitcoin HD wallet([Hierarchical Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)) in your own app.
 
 You can check if the address generation is working right [here](https://iancoleman.io/bip39/).
