@@ -13,6 +13,8 @@ class AddressFactory {
         switch network.coin {
         case .bitcoin:
             return BitcoinAddressProvider(network: network, publicKey: publicKey)
+        case .litecoin:
+            return LitecoinAddressProvider(network: network, publicKey: publicKey)
         case .ethereum, .ethereumClassic:
             return EthereumAddressProvider(network: network, publicKey: publicKey)
         }

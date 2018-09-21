@@ -19,6 +19,10 @@ class EthereumAddressProvider: AddressProvider {
     }
     
     var address: String? {
+        guard case .bip44 = publicKey.spec else {
+            return nil
+        }
+        
         guard let addressData = publicToAddressData(publicKey.uncompressed) else {
             return nil
         }

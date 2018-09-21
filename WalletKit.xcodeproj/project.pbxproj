@@ -50,6 +50,8 @@
 		D992D7CF2154CE7A0038E113 /* EthereumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7CE2154CE7A0038E113 /* EthereumTests.swift */; };
 		D992D7D12154D1AB0038E113 /* EthereumClassicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7D02154D1AB0038E113 /* EthereumClassicTests.swift */; };
 		D992D7D42154D3560038E113 /* String+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7D32154D3560038E113 /* String+Hex.swift */; };
+		D992D7D62154E4780038E113 /* LitecoinAddressProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7D52154E4780038E113 /* LitecoinAddressProvider.swift */; };
+		D992D7D82154E4E60038E113 /* LitecoinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992D7D72154E4E60038E113 /* LitecoinTests.swift */; };
 		FA587C8B20BC47C60033F34A /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8A20BC47C60033F34A /* Bech32.swift */; };
 		FA587C8D20BC4C1A0033F34A /* SegwitAddrCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA587C8C20BC4C1A0033F34A /* SegwitAddrCoder.swift */; };
 /* End PBXBuildFile section */
@@ -145,6 +147,8 @@
 		D992D7CE2154CE7A0038E113 /* EthereumTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EthereumTests.swift; sourceTree = "<group>"; };
 		D992D7D02154D1AB0038E113 /* EthereumClassicTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EthereumClassicTests.swift; sourceTree = "<group>"; };
 		D992D7D32154D3560038E113 /* String+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Hex.swift"; sourceTree = "<group>"; };
+		D992D7D52154E4780038E113 /* LitecoinAddressProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LitecoinAddressProvider.swift; sourceTree = "<group>"; };
+		D992D7D72154E4E60038E113 /* LitecoinTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LitecoinTests.swift; sourceTree = "<group>"; };
 		FA587C8A20BC47C60033F34A /* Bech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32.swift; sourceTree = "<group>"; };
 		FA587C8C20BC4C1A0033F34A /* SegwitAddrCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegwitAddrCoder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -205,6 +209,7 @@
 				AE90A0791FFA698D005ED7AF /* Info.plist */,
 				D992D7CC2154CE2A0038E113 /* BitcoinTests.swift */,
 				D992D7CE2154CE7A0038E113 /* EthereumTests.swift */,
+				D992D7D72154E4E60038E113 /* LitecoinTests.swift */,
 				D992D7D02154D1AB0038E113 /* EthereumClassicTests.swift */,
 			);
 			path = WalletKitTests;
@@ -307,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				D992D7C82153D2D90038E113 /* BitcoinAddressProvider.swift */,
+				D992D7D52154E4780038E113 /* LitecoinAddressProvider.swift */,
 				D992D7CA2153D30D0038E113 /* EthereumAddressProvider.swift */,
 			);
 			path = Addresses;
@@ -511,6 +517,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D992D7CF2154CE7A0038E113 /* EthereumTests.swift in Sources */,
+				D992D7D82154E4E60038E113 /* LitecoinTests.swift in Sources */,
 				D992D7D12154D1AB0038E113 /* EthereumClassicTests.swift in Sources */,
 				D992D7CD2154CE2A0038E113 /* BitcoinTests.swift in Sources */,
 				AE90A0781FFA698D005ED7AF /* WalletKitTests.swift in Sources */,
@@ -536,6 +543,7 @@
 				AE1BF3372028B5B000344FB0 /* Crypto.swift in Sources */,
 				AE1BF3332028AEA400344FB0 /* PrivateKey.swift in Sources */,
 				D992D7D42154D3560038E113 /* String+Hex.swift in Sources */,
+				D992D7D62154E4780038E113 /* LitecoinAddressProvider.swift in Sources */,
 				FA587C8D20BC4C1A0033F34A /* SegwitAddrCoder.swift in Sources */,
 				AE10B15120305B2500565720 /* Mnemonic.swift in Sources */,
 				AE10B15320305B6500565720 /* DataConvertable.swift in Sources */,

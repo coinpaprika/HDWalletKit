@@ -8,7 +8,7 @@
 
 public enum Coin {
     case bitcoin
-//    case litecoin
+    case litecoin
 //    case nem
     case ethereum
     case ethereumClassic
@@ -54,8 +54,8 @@ public enum Network {
             switch coin {
             case .bitcoin:
                 return 0
-//            case .litecoin:
-//                return 2
+            case .litecoin:
+                return 2
 //            case .nem:
 //                return 43
             case .ethereum:
