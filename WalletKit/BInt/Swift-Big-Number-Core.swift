@@ -1,6 +1,6 @@
 //
 //	————————————————————————————————————————————————————————————————————————————————————————————
-//	||||||||||||||||                       SMP Core.swift                       ||||||||||||||||
+//	|||||||||                       Swift-Big-Number-Core.swift                       ||||||||||
 //	————————————————————————————————————————————————————————————————————————————————————————————
 //	Created by Marcel Kröker on 30.09.16.
 //	Copyright (c) 2016 Blubyte. All rights reserved.
@@ -177,22 +177,30 @@ public struct BInt:
 	//
 	//
 
+	/// Stores the sign of the number represented by the BInt. "true" means that the number is
+	/// less than zero, "false" means it's more than or equal to zero.
 	internal var sign  = false
+	/// Stores the absolute value of the number represented by the BInt. Each element represents
+	/// a "digit" of the number in base 2^64 in an acending order, where the first element is
+	/// the least significant "digit". This representations is the most efficient one for
+	/// computations, however it also means that the number is stored in a non-human-readable
+	/// fashion. To make it readable as a decimal number, BInt offers the required functions.
 	internal var limbs = Limbs()
 
-	// Required by protocol Numeric
+	// Required by the protocol "Numeric".
 	public typealias Magnitude = UInt64
 
-	// Required by protocol Numeric
+	// Required by the protocol "Numeric". It's pretty useless because the magnitude of a BInt won't
+	// fit into a UInt64 generally, so we just return the first limb of the BInt.
 	public var magnitude: UInt64
 	{
 		return self.limbs[0]
 	}
 
+	// Required by the protocol "BinaryInteger".
 	public typealias Words = [UInt]
 
-	/// A collection containing the words of this value’s binary representation, in order from
-	///	the least significant to most significant.
+	// Required by the protocol "BinaryInteger".
 	public var words: BInt.Words
 	{
 		return self.limbs.map{ UInt($0) }
@@ -218,7 +226,7 @@ public struct BInt:
 		{
 			return String(format: "%.1f kb", Double(bits) / 8_000.0)
 		}
-		if bits < 8_000_000_000
+		if UInt64(bits) < UInt64(8_000_000_000.0)
 		{
 			return String(format: "%.1f mb", Double(bits) / 8_000_000.0)
 		}
@@ -281,10 +289,7 @@ public struct BInt:
 	/// Create an instance initialized to a string value.
 	public init?(_ str: String)
 	{
-		var str = str
-		var sign = false
-		var base: Limbs = [1]
-		var limbs: Limbs = [0]
+		var (str, sign, base, limbs) = (str, false, [Limb(1)], [Limb(0)])
 
 		limbs.reserveCapacity(Int(Double(str.count) / log10(pow(2.0, 64.0))))
 
@@ -308,6 +313,73 @@ public struct BInt:
 		}
 
 		self.init(sign: sign, limbs: limbs)
+	}
+
+	/// Create an instance initialized to a string with the value of mathematical numerical
+	/// system of the specified radix (base). So for example, to get the value of hexadecimal
+	/// string radix value must be set to 16.
+	public init?(_ number: String, radix: Int)
+	{
+		if radix == 10
+		{
+			// Regular string init is faster for decimal numbers.
+			self.init(number)
+			return
+		}
+
+		let chars: [Character] = [
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g",
+			"h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
+			"y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+			"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+		]
+
+		var (number, sign, base, limbs) = (number, false, [Limb(1)], [Limb(0)])
+
+		if number.hasPrefix("-")
+		{
+			number.remove(at: number.startIndex)
+			sign = number != "0"
+		}
+
+		for char in number.reversed()
+		{
+			if let digit = chars.index(of: char), digit < radix
+			{
+				limbs.addProductOf(multiplier: base, multiplicand: Limb(digit))
+				base = base.multiplyingBy([Limb(radix)])
+			}
+			else
+			{
+				return nil
+			}
+		}
+
+		self.init(sign: sign, limbs: limbs)
+	}
+
+	/// Create an instance initialized to a string with the value of mathematical numerical
+	/// system of the specified radix (base). You have to specify the base as a prefix, so for
+	/// example, "0b100101010101110" is a vaild input for a binary number. Currently,
+	/// hexadecimal (0x), octal (0o) and binary (0b) are supported.
+	public init?(prefixedNumber number: String)
+	{
+		if number.hasPrefix("0x")
+		{
+			self.init(String(number.dropFirst(2)), radix: 16)
+		}
+		if number.hasPrefix("0o")
+		{
+			self.init(String(number.dropFirst(2)), radix: 8)
+		}
+		if number.hasPrefix("0b")
+		{
+			self.init(String(number.dropFirst(2)), radix: 2)
+		}
+		else
+		{
+			return nil
+		}
 	}
 
 	//	Requierd by protocol ExpressibleByFloatLiteral.
@@ -362,35 +434,6 @@ public struct BInt:
 
 	//
 	//
-	//	MARK: - CustomStringConvertible conformance
-	//	————————————————————————————————————————————————————————————————————————————————————————
-	//	||||||||        CustomStringConvertible conformance        |||||||||||||||||||||||||||||
-	//	————————————————————————————————————————————————————————————————————————————————————————
-	//
-	//
-	//
-
-	public var description: String
-	{
-		return (self.sign ? "-" : "").appending(self.limbs.decimalRepresentation)
-	}
-
-	public init?(number: String, withBase base: Int)
-	{
-		self.init(number.convertingBase(from: base, toBase: 10))
-	}
-
-	public func asString(withBase base: Int) -> String
-	{
-		let str = self.limbs.decimalRepresentation
-		let newStr = str.convertingBase(from: 10, toBase: base)
-
-		if self.sign { return "-".appending(newStr) }
-		return newStr
-	}
-
-	//
-	//
 	//	MARK: - Struct functions
 	//	————————————————————————————————————————————————————————————————————————————————————————
 	//	||||||||        Struct functions        ||||||||||||||||||||||||||||||||||||||||||||||||
@@ -399,25 +442,59 @@ public struct BInt:
 	//
 	//
 
-	///	Returns BInt value as an integer, if possible.
-	func toInt() -> Int?
+	// Required by protocol CustomStringConvertible.
+	public var description: String
 	{
-		//	Conversion only works when self has only one limb thats smaller or
-		//	equal to abs(Int.min).
+		return (self.sign ? "-" : "").appending(self.limbs.decimalRepresentation)
+	}
 
+	/// Returns the BInt's value in the given base (radix) as a string.
+	public func asString(radix: Int) -> String
+	{
+		let chars: [Character] = [
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g",
+			"h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x",
+			"y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+			"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+		]
+
+		var (limbs, res) = (self.limbs, "")
+
+		while !limbs.equalTo(0)
+		{
+			let divmod = limbs.divMod([Limb(radix)])
+
+			if let r = divmod.remainder.first, r < radix
+			{
+				res.append(chars[Int(r)])
+				limbs = divmod.quotient
+			}
+			else
+			{
+				fatalError("BInt.asString: Base too big, should be between 2 and 62")
+			}
+		}
+
+		if res == "" { return "0" }
+		return (self.sign ? "-" : "").appending(String(res.reversed()))
+	}
+
+	///	Returns BInt's value as an integer. Conversion only works when self has only one limb
+	/// that's within the range of the type "Int".
+	func asInt() -> Int?
+	{
 		if self.limbs.count != 1 { return nil }
 
 		let number = self.limbs[0]
 
-		//	Self is within the range of Int
 		if number <= Limb(Int.max)
 		{
 			return self.sign ? -Int(number) : Int(number)
 		}
 
-		//	Special case: self == Int.min
 		if number == (Limb(Int.max) + 1) && self.sign
 		{
+			// This is a special case where self == Int.min
 			return Int.min
 		}
 
@@ -434,11 +511,20 @@ public struct BInt:
 		return "\(self.sign)\(self.limbs)".hashValue
 	}
 
-	///	A Boolean value indicating whether this type is a signed integer type.
+	// Required by the protocol "BinaryInteger". A Boolean value indicating whether this type is a
+	// signed integer type.
 	public static var isSigned: Bool
 	{
 		return true
 	}
+
+	// Required by the protocol "BinaryInteger". The number of bits in the current binary
+	// representation of this value.
+	public var bitWidth: Int
+	{
+		return self.limbs.bitWidth
+	}
+
 
 	///	Returns -1 if this value is negative and 1 if it’s positive; otherwise, 0.
 	public func signum() -> BInt
@@ -454,12 +540,6 @@ public struct BInt:
 	func isNotZero()  -> Bool { return self.limbs[0] != 0 || self.limbs.count >  1 }
 	func isOdd()      -> Bool { return self.limbs[0] & 1 == 1 }
 	func isEven()     -> Bool { return self.limbs[0] & 1 == 0 }
-
-	///	The number of bits in the current binary representation of this value.
-	public var bitWidth: Int
-	{
-		return self.limbs.bitWidth
-	}
 
 	///	The number of trailing zeros in this value’s binary representation.
 	public var trailingZeroBitCount: Int
@@ -525,7 +605,7 @@ public struct BInt:
 
 		for i in 0..<(64 * Swift.max(lhs.limbs.count, rhs.limbs.count))
 		{
-			let newBit = lhs.limbs.getBit(at: i) && lhs.limbs.getBit(at: i)
+			let newBit = lhs.limbs.getBit(at: i) && rhs.limbs.getBit(at: i)
 			res.setBit(at: i, to: newBit)
 		}
 
@@ -562,7 +642,7 @@ public struct BInt:
 
 		for i in 0..<(64 * Swift.max(lhs.limbs.count, rhs.limbs.count))
 		{
-			let newBit = lhs.limbs.getBit(at: i) || lhs.limbs.getBit(at: i)
+			let newBit = lhs.limbs.getBit(at: i) || rhs.limbs.getBit(at: i)
 			res.setBit(at: i, to: newBit)
 		}
 
@@ -596,7 +676,7 @@ public struct BInt:
 
 		for i in 0..<(64 * Swift.max(lhs.limbs.count, rhs.limbs.count))
 		{
-			let newBit = lhs.limbs.getBit(at: i) != lhs.limbs.getBit(at: i)
+			let newBit = lhs.limbs.getBit(at: i) != rhs.limbs.getBit(at: i)
 			res.setBit(at: i, to: newBit)
 		}
 
@@ -605,7 +685,7 @@ public struct BInt:
 
 	public static func ^=(lhs: inout BInt, rhs: BInt)
 	{
-		let res = lhs | rhs
+		let res = lhs ^ rhs
 		lhs = res
 	}
 
@@ -674,7 +754,7 @@ public struct BInt:
 	static func +(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) + rhs }
 	static func +(lhs: BInt, rhs:  Int) -> BInt { return lhs + BInt(rhs) }
 
-	static func +=(lhs: inout  Int, rhs: BInt) { lhs += (BInt(lhs) + rhs).toInt()! }
+	static func +=(lhs: inout  Int, rhs: BInt) { lhs += (BInt(lhs) + rhs).asInt()! }
 	static func +=(lhs: inout BInt, rhs:  Int) { lhs +=  BInt(rhs)                 }
 
 	//
@@ -722,7 +802,7 @@ public struct BInt:
 
 	// Required by protocol Numeric
 	public static func -=(lhs: inout BInt, rhs: BInt) { lhs += -rhs                        }
-	static func -=(lhs: inout  Int, rhs: BInt)  { lhs  = (BInt(lhs) - rhs).toInt()! }
+	static func -=(lhs: inout  Int, rhs: BInt)  { lhs  = (BInt(lhs) - rhs).asInt()! }
 	static func -=(lhs: inout BInt, rhs:  Int)  { lhs -= BInt(rhs)                  }
 
 	//
@@ -747,7 +827,7 @@ public struct BInt:
 
 	// Required by protocol SignedNumeric
 	public static func *=(lhs: inout BInt, rhs: BInt) { lhs = lhs * rhs                  }
-	static func *=(lhs: inout  Int, rhs: BInt) { lhs = (BInt(lhs) * rhs).toInt()! }
+	static func *=(lhs: inout  Int, rhs: BInt) { lhs = (BInt(lhs) * rhs).asInt()! }
 	static func *=(lhs: inout BInt, rhs:  Int) { lhs = lhs * BInt(rhs)            }
 
 	//
@@ -770,7 +850,7 @@ public struct BInt:
 	{
 		precondition(!self.sign, "Can't calculate the factorial of an negative number")
 
-		return BInt(limbs: Limbs.recursiveMul(0, Limb(self.toInt()!)))
+		return BInt(limbs: Limbs.recursiveMul(0, Limb(self.asInt()!)))
 	}
 
 	//
@@ -911,6 +991,7 @@ public struct BInt:
 	static func >=(lhs:  Int, rhs: BInt) -> Bool { return !(BInt(lhs) < rhs) }
 	static func >=(lhs: BInt, rhs:  Int) -> Bool { return !(lhs < BInt(rhs)) }
 }
+
 //
 //
 //	MARK: - String operations
@@ -924,6 +1005,7 @@ public struct BInt:
 //
 //
 //
+
 fileprivate extension String
 {
 	// Splits the string into equally sized parts (exept for the last one).
@@ -934,60 +1016,12 @@ fileprivate extension String
 			return String(self[start..<end])
 		}
 	}
-
-	///	Assuming that this String represents a number in some base fromBase, return a String
-	///	that contains the number converted to base toBase.
-	func convertingBase(from: Int, toBase: Int) -> String
-	{
-		let chars: [Character] = [
-			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b",
-			"c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
-			"o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-			"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
-			"M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
-			"Y", "Z"
-		]
-
-		var res = ""
-		var number = self
-
-		if number.hasPrefix("-")
-		{
-			res = "-"
-			number.removeFirst()
-		}
-
-		var sum = BInt(0)
-		var multiplier = BInt(1)
-
-		for char in number.reversed()
-		{
-			if let digit = chars.index(of: char)
-			{
-				precondition(digit < from)
-
-				sum += digit * multiplier
-				multiplier *= from
-			}
-			else
-			{
-				fatalError()
-			}
-		}
-
-		repeat
-		{
-			res.insert(chars[(sum % toBase).toInt()!], at: res.startIndex)
-			sum /= BInt(toBase)
-		}
-			while sum != 0
-
-		return res
-	}
 }
+
 fileprivate let DigitBase:     Digit = 1_000_000_000_000_000_000
 fileprivate let DigitHalfBase: Digit =             1_000_000_000
 fileprivate let DigitZeros           =                        18
+
 fileprivate extension Array where Element == Limb
 {
 	var decimalRepresentation: String
@@ -1894,7 +1928,7 @@ fileprivate extension Array where Element == Limb
 //
 //
 //
-public class BIntMath
+internal class BIntMath
 {
 	/// Returns true iff (2 ** exp) - 1 is a mersenne prime.
 	static func isMersenne(_ exp: Int) -> Bool
@@ -2260,7 +2294,12 @@ public struct BDouble:
 
 				if sign
 				{
-					if let safeAfterExp = Int(afterExp) {
+					if var safeAfterExp = Int(afterExp) {
+                        if beforeExp.starts(with: "+") || beforeExp.starts(with: "-") {
+                            safeAfterExp = safeAfterExp - beforeExp.count + 2
+                        } else {
+                            safeAfterExp = safeAfterExp - beforeExp.count + 1
+                        }
 						let den = ["1"] + [Character](repeating: "0", count: safeAfterExp)
 						self.init(beforeExp, over: String(den))
 						return
@@ -2269,7 +2308,12 @@ public struct BDouble:
 				}
 				else
 				{
-					if let safeAfterExp = Int(afterExp) {
+					if var safeAfterExp = Int(afterExp) {
+                        if beforeExp.starts(with: "+") || beforeExp.starts(with: "-") {
+                            safeAfterExp = safeAfterExp - beforeExp.count + 2
+                        } else {
+                            safeAfterExp = safeAfterExp - beforeExp.count + 1
+                        }
 						let num = beforeExp + String([Character](repeating: "0", count: safeAfterExp))
 						self.init(num, over: "1")
 						return
@@ -2301,6 +2345,56 @@ public struct BDouble:
 		}
 	}
 
+	/// Create an instance initialized to a string with the value of mathematical numerical system of the specified radix (base).
+	/// So for example, to get the value of hexadecimal string radix value must be set to 16.
+	public init?(_ nStr: String, radix: Int)
+	{
+		if radix == 10 {
+			// regular string init is faster
+			// see metrics
+			self.init(nStr)
+			return
+		}
+		
+		var useString = nStr
+		if radix == 16 {
+			if useString.hasPrefix("0x") {
+				useString = String(nStr.dropFirst(2))
+			}
+		}
+		
+		if radix == 8 {
+			if useString.hasPrefix("0o") {
+				useString = String(nStr.dropFirst(2))
+			}
+		}
+		
+		if radix == 2 {
+			if useString.hasPrefix("0b") {
+				useString = String(nStr.dropFirst(2))
+			}
+		}
+		
+		let bint16 = BDouble(radix)
+		
+		var total = BDouble(0)
+		var exp = BDouble(1)
+		
+		for c in useString.reversed() {
+			let int = Int(String(c), radix: radix)
+			if int != nil {
+				let value =  BDouble(int!)
+				total = total + (value * exp)
+				exp = exp * bint16
+			} else {
+				return nil
+			}
+		}
+		
+		self.init(String(describing:total))
+		
+	}
+	
 	public init(_ z: Int)
 	{
 		self.init(z, over: 1)
@@ -2403,56 +2497,58 @@ public struct BDouble:
 	 */
 	public var decimalDescription : String
 	{
-		return self.decimalExpansion(precisionAfterComma: self.precision)
+		return self.decimalExpansion(precisionAfterDecimalPoint: self.precision)
 	}
 
 	/**
-	 * returns the current value in decimal format
+	 Returns the current value in decimal format (always with a decimal point).
+	 - parameter precision: the precision after the decimal point
+	 - parameter rounded: whether or not the return value's last digit will be rounded up
 	 */
-	public func decimalExpansion(precisionAfterComma digits: Int) -> String
-	{
-		if self.isZero() {
-			return "0." + String(repeating: "0", count: max(digits, 1))
-		}
-		
-		let multiplier = [10].exponentiating(digits)
+    public func decimalExpansion(precisionAfterDecimalPoint precision: Int, rounded : Bool = true) -> String
+    {
+        var currentPrecision = precision
 
-		let rawRes = abs(self).numerator.multiplyingBy(multiplier).divMod(self.denominator).quotient
+        if(rounded && precision > 0) {
+            currentPrecision = currentPrecision + 1
+        }
 
-		var res = BInt(limbs: rawRes).description // just the BInt
-		
-		print("before", res)
-		
-		if digits > 0 && digits < res.count {
-			res.insert(".", at: String.Index(encodedOffset: res.count - digits))
-		} else if res.count <= digits {
-			let origRes = res
-			let w = abs(self).numerator.multiplyingBy(multiplier).divMod(self.denominator).remainder
-			res = "0." + String((BInt(limbs: w).description as String).reversed())
-			if res.count < digits + 2
-			{
-				print("adding padding")
-				let pad = String(repeating: "0", count: max(digits, 1))
-				res = res.padding(toLength: digits+2-origRes.count, withPad: pad, startingAt: res.count)
-			}
-			res = res + origRes
-			res = res.prefix(max(3, digits+2)).description
-			print("warning!", res, digits, w)
-		}
-		
-		if res == "0"
-		{
-			res = "0." + String(repeating: "0", count: max(digits, 1))
-		}
-		
-		if self.isNegative() {
-			res = "-" + res
-		}
-		
-		print("after", res, self.numerator, self.denominator)
-		
-		return res
-	}
+        let multiplier = [10].exponentiating(currentPrecision)
+        let limbs = self.numerator.multiplyingBy(multiplier).divMod(self.denominator).quotient
+        var res = BInt(limbs: limbs).description
+        
+        if currentPrecision <= res.count
+        {
+            res.insert(".", at: String.Index(encodedOffset: res.count - currentPrecision))
+            if res.hasPrefix(".") { res = "0" + res }
+            else if res.hasSuffix(".") { res += "0" }
+        }
+        else
+        {
+            res = "0." + String(repeating: "0", count: currentPrecision - res.count) + res
+        }
+        
+        var retVal = self.isNegative() && !limbs.equalTo(0) ? "-" + res : res
+
+        if(rounded && precision > 0) {
+
+            let lastDigit = Int(retVal.suffix(1))! // this should always be a number
+            let secondDigit = retVal.suffix(2).prefix(1) // this could be a decimal
+            
+            retVal = String(retVal.prefix(retVal.count-2))
+            if (secondDigit != ".") {
+                if lastDigit >= 5 {
+                    retVal = retVal + String(Int(secondDigit)! + 1)
+                } else {
+                    retVal = retVal + String(Int(secondDigit)!)
+                }
+            } else {
+                retVal = retVal + "." + String(lastDigit)
+            }
+        }
+
+        return retVal
+    }
 
 	public var hashValue: Int
 	{
@@ -2484,7 +2580,7 @@ public struct BDouble:
 		{
 			return String(format: "%.1f kb", Double(bits) / 8_000.0)
 		}
-		if bits < 8_000_000_000
+		if UInt64(bits) < UInt64(8_000_000_000.0)
 		{
 			return String(format: "%.1f mb", Double(bits) / 8_000_000.0)
 		}
@@ -2744,6 +2840,29 @@ public struct BDouble:
 	//
 	//
 
+	/**
+	* An == comparison with an epsilon (fixed then a calculated "ULPs")
+	 * Reference: http://floating-point-gui.de/errors/comparison/
+	 * Reference: https://bitbashing.io/comparing-floats.html
+	 */
+	public static func nearlyEqual(_ lhs: BDouble, _ rhs: BDouble, epsilon: Double = 0.00001) -> Bool {
+		let absLhs = abs(lhs)
+		let absRhs = abs(rhs);
+		let diff = abs(lhs - rhs);
+		
+		if (lhs == rhs) { // shortcut, handles infinities
+			return true;
+		} else if diff <= epsilon {
+			return true // shortcut
+		} else if (lhs == 0 || rhs == 0 || diff < Double.leastNormalMagnitude) {
+			// lhs or rhs is zero or both are extremely close to it
+			// relative error is less meaningful here
+			return diff < (epsilon * Double.leastNormalMagnitude);
+		} else { // use relative error
+			return diff / min((absLhs + absRhs), BDouble(Double.greatestFiniteMagnitude)) < epsilon;
+		}
+	}
+	
 	public static func ==(lhs: BDouble, rhs: BDouble) -> Bool
 	{
 		if lhs.sign != rhs.sign { return false }
@@ -2792,7 +2911,7 @@ public struct BDouble:
 
 //
 //
-//	MARK: - BDouble more Operators
+//	MARK: - BDouble Operators
 //	————————————————————————————————————————————————————————————————————————————————————————————
 //	||||||||        BDouble more Operators        ||||||||||||||||||||||||||||||||||||||||||||||
 //	————————————————————————————————————————————————————————————————————————————————————————————
@@ -2885,4 +3004,24 @@ public func ceil(_ base: BDouble) -> BInt
  */
 public func pow(_ base : BDouble, _ exp : Int) -> BDouble {
 	return base**exp
+}
+
+/**
+ * Returns the BDouble that is the smallest
+ */
+public func min(_ lhs: BDouble, _ rhs: BDouble) -> BDouble {
+	if lhs <= rhs {
+		return lhs
+	}
+	return rhs
+}
+
+/**
+ * Returns the BDouble that is largest
+ */
+public func max(_ lhs: BDouble, _ rhs: BDouble) -> BDouble {
+	if lhs >= rhs {
+		return lhs
+	}
+	return rhs
 }

@@ -26,7 +26,7 @@ extension BInt {
     }
     
     init?(hex: String) {
-        self.init(number: hex.lowercased(), withBase: 16)
+        self.init(hex.lowercased(), radix: 16)
     }
     
     init(data: Data) {
